@@ -9,5 +9,7 @@
 # include <ctype.h>
 # include <sys/socket.h>
 
+/*** MAIN ***/
+int main();
 
 #endif
