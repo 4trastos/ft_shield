@@ -1,7 +1,19 @@
-#include "./include/ft_shield.h"
+#include "../include/ft_shield.h"
 
 int main()
 {
+    t_troyan *shield;
+
+    if (getuid())
+    {
+        printf("Estos son los permisos de usuario ( %d )\n", getuid());
+        return (1);
+    }
+    shield = malloc(sizeof(t_troyan));
+    if (!shield)
+        return (1);
+    shield->id = getuid();
+    printf("Estos son los permisos de usuario ( %d )\n", shield->id);
     return (0);
 }
 

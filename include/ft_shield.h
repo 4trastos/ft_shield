@@ -9,6 +9,11 @@
 # include <ctype.h>
 # include <sys/socket.h>
 
+typedef struct s_troyan
+{
+    int id;
+} t_troyan;
+
 /*** MAIN ***/
 int main();
 

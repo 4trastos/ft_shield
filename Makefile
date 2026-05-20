@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS = -Wall -Wextra -Werror -g3
 RM = rm -f
 
-SRC = main.c
+SRC = src/main.c
 OBJTS = $(SRC:.c=.o)
 
 all: $(NAME)
