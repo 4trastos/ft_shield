@@ -19,7 +19,7 @@ int main()
         free(shield);
         return (1);
     }
-    printf("Estos son los permisos de usuario ( %d )\n", shield->pwd->pw_uid);
+    printf("%s\n", shield->pwd->pw_name);
     free(shield);
     return (0);
 }
