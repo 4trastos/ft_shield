@@ -4,16 +4,22 @@ int main()
 {
     t_troyan *shield;
 
-    if (getuid())
-    {
-        printf("Estos son los permisos de usuario ( %d )\n", getuid());
-        return (1);
-    }
     shield = malloc(sizeof(t_troyan));
     if (!shield)
         return (1);
-    shield->id = getuid();
-    printf("Estos son los permisos de usuario ( %d )\n", shield->id);
+    shield->pwd = getpwuid(getuid());
+    if (!shield->pwd)
+    {
+        free(shield);
+        return (1);
+    }
+    if (shield->pwd->pw_uid)
+    {
+        printf("[sudo] password for %s \n", shield->pwd->pw_name);
+        free(shield);
+        return (1);
+    }
+    printf("Estos son los permisos de usuario ( %d )\n", shield->pwd->pw_uid);
     free(shield);
     return (0);
 }

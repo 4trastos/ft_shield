@@ -8,10 +8,12 @@
 # include <stdlib.h>
 # include <ctype.h>
 # include <sys/socket.h>
+# include <sys/types.h>
+# include <pwd.h>
 
 typedef struct s_troyan
 {
-    int id;
+    struct passwd   *pwd;
 } t_troyan;
 
 /*** MAIN ***/
