@@ -14,6 +14,7 @@ int main()
         return (1);
     shield->id = getuid();
     printf("Estos son los permisos de usuario ( %d )\n", shield->id);
+    free(shield);
     return (0);
 }
 
