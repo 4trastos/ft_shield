@@ -1,25 +1,77 @@
+## Índice:
+- [1. Verificación de privilegios:](#1-verificación-de-privilegios)
+- [2. El "Señuelo" (Stdout)](#2-el-señuelo-stdout)
+- [3.  Infiltración del payload:](#3-infiltración-del-payload)
+- [4. Instalación de la Persistencia](#4-instalación-de-la-persistencia)
+- [5. Salida limpia](#5-salida-limpia)
+
+## Resumen:
+
+```bash
+Atacante ejecuta ft_shield  → máquina infectada
+                            → daemon arranca en cada boot
+                            → atacante se conecta por red al puerto 4242
+                            → introduce password
+                            → tiene shell root
+```
+```bash
+nc ip_victima 4242
+Keycode: mipassword
+$> shell
+# ahora tenemos una shell root en la máquina víctima
+```
+
+
 ## Fase 1: El binario "Infección" (Primera ejecución)
 
 Este es el archivo ejecutable que compilamos inicialmente y ejecutamos de forma manual con privilegios de administrador. Su único objetivo en este punto es preparar el terreno dentro de la máquina virtual.
 
-1. 
-**Verificación de privilegios:** Lo primero que hace nuestro programa al arrancar es comprobar si se ha ejecutado con permisos de administrador (mediante `getuid()`). Si no somos `root`, el programa debe terminar inmediatamente sin realizar ninguna acción. 
+### 1. Verificación de privilegios:
+Lo primero que hace nuestro programa al arrancar es comprobar si se ha ejecutado con permisos de administrador (mediante `getuid()`). Si no somos `root`, el programa debe terminar inmediatamente sin realizar ninguna acción. 
 
 
-2. 
-**El "Señuelo" (Stdout):** Imprimimos nuestro login de la escuela por la salida estándar. Esto es lo único que el usuario evaluador debe ver visualmente en su terminal durante esta primera fase.
+### 2. El "Señuelo" (Stdout): 
+Imprimimos nuestro login de la escuela por la salida estándar. Esto es lo único que el usuario evaluador debe ver visualmente en su terminal durante esta primera fase.
 
 
-3. 
-**Infiltración del payload:** En segundo plano, nuestro programa abre su propio ejecutable (accediendo a `/proc/self/exe`), lee sus propios bytes y se clona a sí mismo en la ruta de binarios del sistema operativo (por ejemplo, `/bin/ft_shield`).
+### 3. Infiltración del payload: 
+En segundo plano, nuestro programa abre su propio ejecutable (accediendo a `/proc/self/exe`), lee sus propios bytes y se clona a sí mismo en la ruta de binarios del sistema operativo (por ejemplo, `/bin/ft_shield`).
+
+```
+[ Disco Duro ]                                   [ Memoria RAM ]
+(Nuestro programa)                             (Estructura t_troyan)
+./ft_shield  ===========================>  shield->buffer_exe [1024 bytes]
+(vía /proc/self/exe)      fread()                       ||
+                                                        || fwrite()
+                                                        \/
+/bin/ft_shield <=========================================
+(Copia idéntica)
+
+```
+
+Comprobar que el tamaño es idéntico (Bit a Bit)
+
+Para asegurarnos de que la copia no está corrupta y pesa exactamente lo mismo que el original, usamos el comando `ls -l` apuntando a ambos:
+
+```bash
+ls -l ./ft_shield /bin/ft_shield
+
+```
+
+Para certificar que dos archivos son gemelos idénticos se calcula su "huella digital digital" mediante un hash (como MD5 o SHA-1). Ejecutamos:
+
+```bash
+md5sum ./ft_shield /bin/ft_shield
+
+```
 
 
-4. 
-**Instalación de la Persistencia:** Escribimos un script o un archivo de configuración de servicio (ya sea en `/etc/init.d/` o un archivo `.service` en `systemd`) para asegurar que ese nuevo binario clonado en la ruta del sistema se ejecute automáticamente cada vez que la máquina se encienda.
+### 4. Instalación de la Persistencia: 
+Escribimos un script o un archivo de configuración de servicio (ya sea en `/etc/init.d/` o un archivo `.service` en `systemd`) para asegurar que ese nuevo binario clonado en la ruta del sistema se ejecute automáticamente cada vez que la máquina se encienda.
 
 
-5. 
-**Salida limpia:** El binario original termina su ejecución sin provocar ningún tipo de alerta o mensaje de error, dejando la máquina lista para el siguiente reinicio.
+### 5. Salida limpia: 
+El binario original termina su ejecución sin provocar ningún tipo de alerta o mensaje de error, dejando la máquina lista para el siguiente reinicio.
 
 
 
@@ -62,19 +114,3 @@ Una vez establecidos de forma estable en el fondo del sistema operativo, activam
 
 12. 
 **Invocación de la Shell de Root:** Finalmente, ejecutamos un `execve("/bin/sh", NULL, NULL)`. Al haber redirigido los descriptores en el paso anterior, el cliente remoto que está escuchando al otro lado de la red recibirá los datos del sistema y obtendrá una terminal interactiva con plenos derechos de `root`.
-
-
-
-```bash
-Atacante ejecuta ft_shield → máquina infectada
-                              → daemon arranca en cada boot
-                              → atacante se conecta por red al puerto 4242
-                              → introduce password
-                              → tiene shell root
-```
-```bash
-nc ip_victima 4242
-Keycode: mipassword
-$> shell
-# ahora tenemos una shell root en la máquina víctima
-```

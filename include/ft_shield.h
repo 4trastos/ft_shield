@@ -22,7 +22,7 @@ typedef struct s_troyan
 } t_troyan;
 
 /*** FUNCTIONS ***/
-int     main();
-void    ft_payload(t_troyan *shield);
+int main();
+int ft_payload(t_troyan *shield);
 
 #endif
