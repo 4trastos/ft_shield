@@ -3,7 +3,7 @@
 Este es el archivo ejecutable que compilamos inicialmente y ejecutamos de forma manual con privilegios de administrador. Su único objetivo en este punto es preparar el terreno dentro de la máquina virtual.
 
 1. 
-**Verificación de privilegios:** Lo primero que hace nuestro programa al arrancar es comprobar si se ha ejecutado con permisos de administrador (mediante `getuid()`). Si no somos `root`, el programa debe terminar inmediatamente sin realizar ninguna acción.
+**Verificación de privilegios:** Lo primero que hace nuestro programa al arrancar es comprobar si se ha ejecutado con permisos de administrador (mediante `getuid()`). Si no somos `root`, el programa debe terminar inmediatamente sin realizar ninguna acción. 
 
 
 2. 

@@ -9,14 +9,20 @@
 # include <ctype.h>
 # include <sys/socket.h>
 # include <sys/types.h>
+# include <sys/stat.h>
 # include <pwd.h>
 
 typedef struct s_troyan
 {
     struct passwd   *pwd;
+    int             bytes_read;
+    char            buffer_exe[1024];
+    FILE            *fd;
+    FILE            *fd_dest;
 } t_troyan;
 
-/*** MAIN ***/
-int main();
+/*** FUNCTIONS ***/
+int     main();
+void    ft_payload(t_troyan *shield);
 
 #endif
