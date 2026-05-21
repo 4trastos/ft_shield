@@ -44,7 +44,9 @@ int main()
         return (1);
     }
     // printf("- Comprobamos que la copia de nuestro binario es exacta:\n");
+    // printf("--------------------------------------------------------\n");
     // system("md5sum ./ft_shield /bin/ft_shield ");
+    // printf("--------------------------------------------------------\n");
     if (ft_payload(shield))
     {
         free(shield);
