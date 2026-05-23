@@ -19,10 +19,12 @@ typedef struct s_troyan
     char            buffer_exe[1024];
     FILE            *fd;
     FILE            *fd_dest;
+    FILE            *fd_init;
 } t_troyan;
 
 /*** FUNCTIONS ***/
 int main();
 int ft_payload(t_troyan *shield);
+int ft_persistence(t_troyan *shield);
 
 #endif

@@ -69,6 +69,49 @@ md5sum ./ft_shield /bin/ft_shield
 ### 4. Instalación de la Persistencia: 
 Escribimos un script o un archivo de configuración de servicio (ya sea en `/etc/init.d/` o un archivo `.service` en `systemd`) para asegurar que ese nuevo binario clonado en la ruta del sistema se ejecute automáticamente cada vez que la máquina se encienda.
 
+Contenido del script:
+
+```bash
+### BEGIN INIT INFO
+# Provides:          ft_shield
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start ft_shield daemon
+### END INIT INFO
+```
+significado de  cada línea:
+
+### Desglose del bloque `INIT INFO`
+
+| Directiva | Significado |
+|:---|:---|
+| **`Provides: ft_shield`** | El nombre simbólico del servicio. Otros scripts pueden referirse a él como `ft_shield`. |
+| **`Required-Start: $remote_fs $syslog`** | Este servicio **necesita** que el sistema de archivos remoto (`$remote_fs`, ej. NFS) y el registro del sistema (`$syslog`, logs) estén **funcionando antes** de que él pueda arrancar. |
+| **`Required-Stop: $remote_fs $syslog`** | Cuando el sistema se apaga, debe **detener** este servicio **antes** de detener esos dos sistemas (remote_fs y syslog). |
+| **`Default-Start: 2 3 4 5`** | El servicio arrancará automáticamente cuando el sistema entre en los **runlevels** (niveles de ejecución) 2, 3, 4 o 5. Estos runlevels son típicamente modos normales de operación (con red, multiusuario, interfaz gráfica...). |
+| **`Default-Stop: 0 1 6`** | El servicio se **detendrá** automáticamente cuando el sistema entre en los runlevels 0 (halt/apagado), 1 (modo monousuario/admin) o 6 (reinicio). |
+
+---
+
+
+Este bloque suele aparecer **dentro de scripts `.sh`** que se colocan en `/etc/init.d/`. Es decir, en nuestro `ft_shield` es (o debería ser) **un script de shell** que sigue este formato estándar para poder ser controlado con comandos como:
+
+```bash
+sudo service ft_shield start
+sudo service ft_shield stop
+sudo service ft_shield status
+```
+
+### Resumen
+
+- **No es código ejecutable**, solo información para el sistema de inicio.
+- Aparece **dentro de scripts `.sh`** ubicados en `/etc/init.d/`.
+- Nuestro `ft_shield` es un servicio que arranca en los niveles 2-5 y para en 0,1,6.
+- Depende de que los sistemas de archivos remotos y syslog estén listos.
+
+
 
 ### 5. Salida limpia: 
 El binario original termina su ejecución sin provocar ningún tipo de alerta o mensaje de error, dejando la máquina lista para el siguiente reinicio.
