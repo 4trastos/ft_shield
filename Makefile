@@ -8,8 +8,8 @@ VM_IP = 192.168.0.30
 VM_USER = root
 VM_PATH = /home/davgalle42/Downloads/ft_shield_update
 
-SRC_SERVER = src/main.c
-SRC_CLIENT = src/knock_knock.c src/socket.c
+SRC_SERVER = src/main.c src/socket_server.c src/signal.c
+SRC_CLIENT = src/knock_knock.c src/socket.c src/socket_reply.c
 
 OBJ_SERVER = $(SRC_SERVER:.c=.o)
 OBJ_CLIENT = $(SRC_CLIENT:.c=.o)
@@ -29,7 +29,7 @@ deploy_and_build_server:
 	@scp $(SRC_SERVER) $(VM_USER)@$(VM_IP):$(VM_PATH)/src/
 	@scp include/ft_shield.h $(VM_USER)@$(VM_IP):$(VM_PATH)/include/
 	@echo "🛠️ Compilando $(SERVER) dentro de la VM de forma remota..."
-	@ssh $(VM_USER)@$(VM_IP) "$(CC) $(CFLAGS) -I $(VM_PATH)/include $(VM_PATH)/src/main.c -o $(VM_PATH)/$(SERVER)"
+	@ssh $(VM_USER)@$(VM_IP) "$(CC) $(CFLAGS) -I $(VM_PATH)/include $(VM_PATH)/src/main.c $(VM_PATH)/src/socket_server.c $(VM_PATH)/src/signal.c -o $(VM_PATH)/$(SERVER)"
 	@echo "✅ ¡Servidor compilado con éxito en la ruta de actualización: $(VM_PATH)/$(SERVER)!"
 
 clean:

