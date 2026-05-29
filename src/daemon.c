@@ -1,4 +1,27 @@
-#include "../include/ft_shield.h"
+#include "ft_shield.h"
+
+int	ft_lockfile(void)
+{
+	int		fd;
+	char	pid_str[16];
+	pid_t	pid;
+
+	fd = open(PID_FILE, O_RDWR | O_CREAT, 0640);
+	if (fd < 0)
+		return (-1);
+
+	if (flock(fd, LOCK_EX | LOCK_NB) < 0)
+	{
+		close(fd);
+		return (-1);
+	}
+
+	pid = getpid();
+	snprintf(pid_str, sizeof(pid_str), "%d\n", pid);
+	write(fd, pid_str, strlen(pid_str));
+
+	return (0);
+}
 
 int ft_create_daemon(t_troyan *shield)
 {

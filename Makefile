@@ -1,10 +1,12 @@
 SERVER = ft_shield
 CLIENT = ft_backdoor
 CC = gcc 
-CFLAGS = -Wall -Wextra -Werror -g3
+CFLAGS = -Wall -Wextra -Werror -g3 -std=c99 -I include
 RM = rm -f
 
-VM_IP = 192.168.0.36
+# VM_IP = 192.168.0.36
+VM_IP = 10.12.200.250
+VM_IP2 = 10.12.200.26
 VM_USER = root
 VM_PATH = /home/davgalle42/Downloads/ft_shield_update
 
@@ -30,11 +32,13 @@ src/sha256.o: src/sha256.s
 deploy_and_build_server:
 	@echo "📡 Conectando con la VM ($(VM_IP))..."
 	@ssh $(VM_USER)@$(VM_IP) "mkdir -p $(VM_PATH)/src $(VM_PATH)/include"
+	@ssh $(VM_USER)@$(VM_IP2) "mkdir -p $(VM_PATH)/src $(VM_PATH)/include"
+	@scp ft_backdoor $(VM_USER)@$(VM_IP2):$(VM_PATH)/
 	@scp $(SRC_SERVER) $(VM_USER)@$(VM_IP):$(VM_PATH)/src/
 	@scp include/ft_shield.h $(VM_USER)@$(VM_IP):$(VM_PATH)/include/
 	@echo "🛠️ Compilando $(SERVER) dentro de la VM de forma remota..."
 	@ssh $(VM_USER)@$(VM_IP) "nasm -f elf64 $(VM_PATH)/src/sha256.s -o $(VM_PATH)/src/sha256.o && \
-		$(CC) $(CFLAGS) -I $(VM_PATH)/include $(VM_PATH)/src/main.c $(VM_PATH)/src/socket_server.c $(VM_PATH)/src/signal.c $(VM_PATH)/src/daemon.c $(VM_PATH)/src/listener.c $(VM_PATH)/src/auth.c $(VM_PATH)/src/sha256.o -o $(VM_PATH)/$(SERVER)"
+		$(CC) $(CFLAGS) -I $(VM_PATH)/include $(VM_PATH)/src/main.c $(VM_PATH)/src/socket_server.c $(VM_PATH)/src/signal.c $(VM_PATH)/src/daemon.c $(VM_PATH)/src/listener.c $(VM_PATH)/src/auth.c $(VM_PATH)/src/sha256.o -o $(VM_PATH)/$(SERVER) -lutil"
 	@echo "✅ ¡Servidor compilado con éxito en la ruta de actualización: $(VM_PATH)/$(SERVER)!"
 
 clean:

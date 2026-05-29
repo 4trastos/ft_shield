@@ -1,4 +1,4 @@
-#include "../include/ft_shield.h"
+#include "ft_shield.h"
 
 // Hash SHA256 de "903100"
 static const unsigned char	g_hash[32] = {

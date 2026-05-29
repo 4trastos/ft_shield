@@ -49,7 +49,7 @@ ft_shield/
 Requiere permisos de superusuario para el uso de sockets RAW. Recomiendo levantar un kernel con docker:
 ```bash
 docker run -it --rm --cap-add=NET_RAW -v "$(pwd):/workspace" -w /workspace \
-  ubuntu:24.04 bash -c "apt update && apt install -y build-essential iputils-ping tcpdump && bash"
+  debian:bullseye bash -c "apt update && apt install -y build-essential inetutils-ping tcpdump nasm make openssh-client && bash"
 ```
 
 ```bash

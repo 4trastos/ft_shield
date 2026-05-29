@@ -1,6 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 
-#include "../include/ft_shield.h"
+#include "ft_shield.h"
 
 void    sigalrm_handler(int signum)
 {
